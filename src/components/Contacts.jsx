@@ -15,7 +15,6 @@ export default function Contacts({ contacts, changeChat }) {
   // }, []);
 
 
-  import { useEffect } from 'react';
 
   useEffect(() => {
     const fetchData = async () => {
