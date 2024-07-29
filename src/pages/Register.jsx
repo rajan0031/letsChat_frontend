@@ -76,7 +76,7 @@ export default function Register() {
       }
       if (data.status === true) {
         localStorage.setItem(
-          process.env.REACT_APP_LOCALHOST_KEY,
+          'desi-chat',
           JSON.stringify(data.user)
         );
         navigate("/");
