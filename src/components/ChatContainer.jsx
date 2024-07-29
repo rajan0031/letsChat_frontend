@@ -29,7 +29,7 @@ export default function ChatContainer({ currentChat, socket }) {
   useEffect(() => {
     const fetchData = async () => {
       const data = await JSON.parse(
-        localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+        localStorage.getItem('dest-chat')
       );
       const response = await axios.post(recieveMessageRoute, {
         from: data._id,
