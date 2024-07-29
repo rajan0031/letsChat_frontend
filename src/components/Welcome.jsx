@@ -3,13 +3,22 @@ import styled from "styled-components";
 import Robot from "../assets/robot.gif";
 export default function Welcome() {
   const [userName, setUserName] = useState("");
-  useEffect(async () => {
-    setUserName(
-      await JSON.parse(
-        localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
-      ).username
-    );
-  }, []);
+
+
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      const user = JSON.parse(localStorage.getItem('desi-chat'));
+      if (user) {
+        setUserName(user.username);
+      }
+    };
+
+    fetchUserName();
+  }, []); // Dependency array is empty because you only want to run this effect on component mount
+
+
+
   return (
     <Container>
       <img src={Robot} alt="" />

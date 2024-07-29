@@ -19,7 +19,7 @@ export default function Contacts({ contacts, changeChat }) {
   useEffect(() => {
     const fetchData = async () => {
       const data = await JSON.parse(
-        localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+        localStorage.getItem('desi-chat')
       );
       setCurrentUserName(data.username);
       setCurrentUserImage(data.avatarImage);

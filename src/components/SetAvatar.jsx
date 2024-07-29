@@ -21,17 +21,27 @@ export default function SetAvatar() {
     theme: "dark",
   };
 
-  useEffect(async () => {
-    if (!localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY))
-      navigate("/login");
-  }, []);
+
+
+  useEffect(() => {
+    const checkLocalStorage = () => {
+      if (!localStorage.getItem('desi-chat')) {
+        navigate("/login");
+      }
+    };
+
+    checkLocalStorage();
+  }, [navigate]); // Add `navigate` to the dependency array
+
+
+
 
   const setProfilePicture = async () => {
     if (selectedAvatar === undefined) {
       toast.error("Please select an avatar", toastOptions);
     } else {
       const user = await JSON.parse(
-        localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+        localStorage.getItem('desi-chat')
       );
 
       const { data } = await axios.post(`${setAvatarRoute}/${user._id}`, {
@@ -51,19 +61,30 @@ export default function SetAvatar() {
       }
     }
   };
+  useEffect(() => {
+    const fetchAvatars = async () => {
+      try {
+        const data = [];
+        for (let i = 0; i < 4; i++) {
+          const response = await axios.get(
+            `${api}/${Math.round(Math.random() * 1000)}`
+          );
+          const buffer = Buffer.from(response.data); // Use Buffer.from instead of new Buffer (deprecated)
+          data.push(buffer.toString("base64"));
+        }
+        setAvatars(data);
+      } catch (error) {
+        console.error("Error fetching avatars:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  useEffect(async () => {
-    const data = [];
-    for (let i = 0; i < 4; i++) {
-      const image = await axios.get(
-        `${api}/${Math.round(Math.random() * 1000)}`
-      );
-      const buffer = new Buffer(image.data);
-      data.push(buffer.toString("base64"));
-    }
-    setAvatars(data);
-    setIsLoading(false);
-  }, []);
+    fetchAvatars();
+  }, []); // Dependency
+
+
+
   return (
     <>
       {isLoading ? (
