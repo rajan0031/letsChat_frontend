@@ -11,33 +11,30 @@ export default function ChatContainer({ currentChat, socket }) {
   const scrollRef = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
 
-  useEffect(() => {
-    async function fetchMessages() {
-      const data = JSON.parse(localStorage.getItem("chat-app-current-user"));
-      const response = await axios.post(recieveMessageRoute, {
-        from: data._id,
-        to: currentChat._id,
-      });
-      setMessages(response.data);
-    }
-    if (currentChat) {
-      fetchMessages();
-    }
+  useEffect(async () => {
+    const data = await JSON.parse(
+      localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+    );
+    const response = await axios.post(recieveMessageRoute, {
+      from: data._id,
+      to: currentChat._id,
+    });
+    setMessages(response.data);
   }, [currentChat]);
 
   useEffect(() => {
-    async function getCurrentChat() {
+    const getCurrentChat = async () => {
       if (currentChat) {
         await JSON.parse(
           localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
         )._id;
       }
-    }
+    };
     getCurrentChat();
   }, [currentChat]);
 
   const handleSendMsg = async (msg) => {
-    const data = JSON.parse(
+    const data = await JSON.parse(
       localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
     );
     socket.current.emit("send-msg", {
@@ -51,7 +48,9 @@ export default function ChatContainer({ currentChat, socket }) {
       message: msg,
     });
 
-    setMessages((prev) => [...prev, { fromSelf: true, message: msg }]);
+    const msgs = [...messages];
+    msgs.push({ fromSelf: true, message: msg });
+    setMessages(msgs);
   };
 
   useEffect(() => {
@@ -60,18 +59,10 @@ export default function ChatContainer({ currentChat, socket }) {
         setArrivalMessage({ fromSelf: false, message: msg });
       });
     }
-    // Cleanup function to remove the listener
-    return () => {
-      if (socket.current) {
-        socket.current.off("msg-recieve");
-      }
-    };
-  }, [socket]);
+  }, []);
 
   useEffect(() => {
-    if (arrivalMessage) {
-      setMessages((prev) => [...prev, arrivalMessage]);
-    }
+    arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
   }, [arrivalMessage]);
 
   useEffect(() => {
@@ -95,15 +86,20 @@ export default function ChatContainer({ currentChat, socket }) {
         <Logout />
       </div>
       <div className="chat-messages">
-        {messages.map((message) => (
-          <div ref={scrollRef} key={uuidv4()}>
-            <div className={`message ${message.fromSelf ? "sended" : "recieved"}`}>
-              <div className="content">
-                <p>{message.message}</p>
+        {messages.map((message) => {
+          return (
+            <div ref={scrollRef} key={uuidv4()}>
+              <div
+                className={`message ${message.fromSelf ? "sended" : "recieved"
+                  }`}
+              >
+                <div className="content ">
+                  <p>{message.message}</p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <ChatInput handleSendMsg={handleSendMsg} />
     </Container>
@@ -115,7 +111,6 @@ const Container = styled.div`
   grid-template-rows: 10% 80% 10%;
   gap: 0.1rem;
   overflow: hidden;
-  background-color: #ece5dd; /* WhatsApp background color */
   @media screen and (min-width: 720px) and (max-width: 1080px) {
     grid-template-rows: 15% 70% 15%;
   }
@@ -124,7 +119,6 @@ const Container = styled.div`
     justify-content: space-between;
     align-items: center;
     padding: 0 2rem;
-    background-color: #075e54; /* WhatsApp header color */
     .user-details {
       display: flex;
       align-items: center;
@@ -150,7 +144,7 @@ const Container = styled.div`
     &::-webkit-scrollbar {
       width: 0.2rem;
       &-thumb {
-        background-color: #075e54; /* Matching scrollbar color */
+        background-color: #ffffff39;
         width: 0.1rem;
         border-radius: 1rem;
       }
@@ -164,8 +158,7 @@ const Container = styled.div`
         padding: 1rem;
         font-size: 1.1rem;
         border-radius: 1rem;
-        color: black; /* Text color */
-        background-color: #ffffff; /* Message background color */
+        color: #d1d1d1;
         @media screen and (min-width: 720px) and (max-width: 1080px) {
           max-width: 70%;
         }
@@ -174,13 +167,13 @@ const Container = styled.div`
     .sended {
       justify-content: flex-end;
       .content {
-        background-color: #dcf8c6; /* Sent message background color */
+        background-color: #4f04ff21;
       }
     }
     .recieved {
       justify-content: flex-start;
       .content {
-        background-color: #ffffff; /* Received message background color */
+        background-color: #9900ff20;
       }
     }
   }
